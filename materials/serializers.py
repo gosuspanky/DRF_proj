@@ -3,8 +3,20 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from materials.models import Course, Lesson
 
 
+class LessonSerializer(ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = (
+            "id",
+            "course",
+            "title",
+            "description",
+        )
+
+
 class CourseSerializer(ModelSerializer):
     lessons_count = SerializerMethodField()
+    lessons_list = LessonSerializer(source='lessons', many=True)
 
     @staticmethod
     def get_lessons_count(obj):
@@ -17,15 +29,5 @@ class CourseSerializer(ModelSerializer):
             "title",
             "description",
             "lessons_count",
-        )
-
-
-class LessonSerializer(ModelSerializer):
-    class Meta:
-        model = Lesson
-        fields = (
-            "id",
-            "course",
-            "title",
-            "description",
+            'lessons_list'
         )
