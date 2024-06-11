@@ -23,17 +23,17 @@ urlpatterns = [
     ),
     path("materials/lesson/", LessonListAPIView.as_view(), name="lesson_list"),
     path(
-        "materials/lesson/<int:pk>",
+        "materials/lesson/<int:pk>/",
         LessonRetrieveAPIView.as_view(),
         name="lesson_detail",
     ),
     path(
-        "materials/lesson/update/<int:pk>",
+        "materials/lesson/update/<int:pk>/",
         LessonUpdateAPIView.as_view(),
         name="lesson_update",
     ),
     path(
-        "materials/lesson/delete/<int:pk>",
+        "materials/lesson/delete/<int:pk>/",
         LessonDestroyAPIView.as_view(),
         name="lesson_delete",
     ),
