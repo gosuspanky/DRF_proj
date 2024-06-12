@@ -1,16 +1,13 @@
-from rest_framework import serializers, filters
+from rest_framework import serializers
 
 from users.models import User, Payments
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    filter_backends = [filters.OrderingFilter]
-    filterset_fields = ('payment_method', 'paid_course', 'paid_lesson',)
-    ordering_fields = ('data',)
 
     class Meta:
         model = Payments
-        fields = ("id", 'data', 'payment_count', 'payment_method', 'paid_course', 'paid_lesson')
+        fields = "__all__"
 
 
 class UserSerializer(serializers.ModelSerializer):
