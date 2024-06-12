@@ -16,4 +16,4 @@ class Command(BaseCommand):
             id=1,
         )
         user.save()
-        print('Суперпользователь создан успешно!')
+        print("Суперпользователь создан успешно!")

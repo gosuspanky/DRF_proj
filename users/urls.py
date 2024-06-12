@@ -6,15 +6,22 @@ from users.views import (
     UserListAPIView,
     UserRetrieveAPIView,
     UserUpdateAPIView,
-    UserDestroyAPIView, PaymentCreateAPIView, PaymentListAPIView, PaymentRetrieveAPIView, PaymentUpdateAPIView,
+    UserDestroyAPIView,
+    PaymentCreateAPIView,
+    PaymentListAPIView,
+    PaymentRetrieveAPIView,
+    PaymentUpdateAPIView,
     PaymentDestroyAPIView,
 )
+
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 app_name = UsersConfig.name
 
 urlpatterns = [
     # users
-    path("users/create/", UserCreateAPIView.as_view(), name="users_create"),
+    path("users/register/", UserCreateAPIView.as_view(), name="users_register"),
     path("users/", UserListAPIView.as_view(), name="users_list"),
     path("users/<int:pk>/", UserRetrieveAPIView.as_view(), name="users_detail"),
     path("users/update/<int:pk>/", UserUpdateAPIView.as_view(), name="users_update"),
@@ -23,8 +30,25 @@ urlpatterns = [
     path("payment/create/", PaymentCreateAPIView.as_view(), name="payment_create"),
     path("payment/", PaymentListAPIView.as_view(), name="payment_list"),
     path("payment/<int:pk>/", PaymentRetrieveAPIView.as_view(), name="payment_detail"),
-    path("payment/update/<int:pk>/", PaymentUpdateAPIView.as_view(), name="payment_update"),
     path(
-        "payment/delete/<int:pk>/", PaymentDestroyAPIView.as_view(), name="payment_delete"
+        "payment/update/<int:pk>/",
+        PaymentUpdateAPIView.as_view(),
+        name="payment_update",
+    ),
+    path(
+        "payment/delete/<int:pk>/",
+        PaymentDestroyAPIView.as_view(),
+        name="payment_delete",
+    ),
+    # token
+    path(
+        "users/login/",
+        TokenObtainPairView.as_view(permissions=(AllowAny,)),
+        name="login",
+    ),
+    path(
+        "users/token/refresh/",
+        TokenRefreshView.as_view(permissions=(AllowAny,)),
+        name="token_refresh",
     ),
 ]
