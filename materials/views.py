@@ -1,9 +1,9 @@
 from rest_framework import viewsets, generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from materials.models import Course, Lesson
 from materials.serializers import CourseSerializer, LessonSerializer
-from users.permissions import IsModer
+from users.permissions import IsModer, IsOwner
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -11,36 +11,53 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
 
     def get_permissions(self):
-        if self.action in ["create", "destroy"]:
-            self.permission_classes = (~IsModer,)
+        if self.action == "create":
+            self.permission_classes = (
+                IsAuthenticated,
+                ~IsModer,
+            )
         elif self.action in ["update", "retrieve"]:
-            self.permission_classes = (IsModer,)
+            self.permission_classes = (IsModer | IsOwner,)
+        elif self.action == "destroy":
+            self.permission_classes = (~IsModer | IsOwner,)
         return super().get_permissions()
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
-    permission_classes = (~IsModer,)
+    permission_classes = (
+        IsAuthenticated,
+        ~IsModer,
+    )
 
 
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
-    permission_classes = (AllowAny,)
+    # permission_classes = (AllowAny, )
 
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
-    permission_classes = (IsModer,)
+    permission_classes = (
+        IsAuthenticated,
+        IsModer | IsOwner,
+    )
 
 
 class LessonUpdateAPIView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
-    permission_classes = (IsModer,)
+    permission_classes = (
+        IsAuthenticated,
+        IsModer | IsOwner,
+    )
 
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
-    permission_classes = (~IsModer,)
+    permission_classes = (
+        IsAuthenticated,
+        ~IsModer | IsOwner,
+    )
