@@ -6,14 +6,10 @@ class Command(BaseCommand):
     """Создание superuser"""
 
     def handle(self, *args, **options):
-        user = User.objects.create(
-            email="admin@sky.pro",
-            first_name="Admin",
-            last_name="Admin",
-            is_staff=True,
-            is_superuser=True,
-            is_active=True,
-            id=1,
-        )
+        user = User.objects.create(email="admin2@sky.pro")
+        user.is_staff = True
+        user.is_active = True
+        user.is_superuser = True
+        user.set_password("spanky290195")
         user.save()
         print("Суперпользователь создан успешно!")
