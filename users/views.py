@@ -11,7 +11,8 @@ from users.serializers import UserSerializer, PaymentSerializer
 class UserCreateAPIView(generics.CreateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+
+    # permission_classes = (AllowAny,) # использую для тестов
 
     def perform_create(self, serializer):
         user = serializer.save(is_active=True)
@@ -22,7 +23,7 @@ class UserCreateAPIView(generics.CreateAPIView):
 class UserListAPIView(generics.ListAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
+    # permission_classes = (AllowAny,) # использую для тестов
 
 
 class UserRetrieveAPIView(generics.RetrieveAPIView):
