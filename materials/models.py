@@ -9,19 +9,19 @@ class Course(models.Model):
         upload_to="materials_media/courses/previews",
         verbose_name="Превью",
         **NULLABLE,
-        help_text="Загрузите превью курса"
+        help_text="Загрузите превью курса",
     )
     description = models.TextField(
         verbose_name="Описание курса",
         **NULLABLE,
-        help_text="Опишите основные материалы курса"
+        help_text="Опишите основные материалы курса",
     )
 
     owner = models.ForeignKey(
         "users.User",
         **NULLABLE,
         on_delete=models.SET_NULL,
-        verbose_name="Владелец курса"
+        verbose_name="Владелец курса",
     )
 
     class Meta:
@@ -41,25 +41,25 @@ class Lesson(models.Model):
     description = models.TextField(
         verbose_name="Описание урока",
         **NULLABLE,
-        help_text="Опишите основные материалы урока"
+        help_text="Опишите основные материалы урока",
     )
     preview = models.ImageField(
         upload_to="materials_media/lessons/previews",
         verbose_name="Превью урока",
         **NULLABLE,
-        help_text="Загрузите превью урока"
+        help_text="Загрузите превью урока",
     )
     video_link = models.URLField(
         verbose_name="Ссылка на видео",
         **NULLABLE,
-        help_text="Укажите ссылку на видео урока"
+        help_text="Укажите ссылку на видео урока",
     )
 
     owner = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
         **NULLABLE,
-        verbose_name="Владелец урока"
+        verbose_name="Владелец урока",
     )
 
     class Meta:
@@ -68,3 +68,24 @@ class Lesson(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        "users.User", on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    course = models.ForeignKey(
+        "materials.Course",
+        on_delete=models.CASCADE,
+        verbose_name="Курс",
+        related_name="subscriptions",
+    )
+
+    date = models.DateField(auto_now_add=True, verbose_name="Дата подписки", **NULLABLE)
+
+    class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+
+    def __str__(self):
+        return f"{self.user} - {self.course}"
