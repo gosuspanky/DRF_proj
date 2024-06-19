@@ -23,7 +23,7 @@ class UserCreateAPIView(generics.CreateAPIView):
 class UserListAPIView(generics.ListAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    # permission_classes = (AllowAny,) # использую для тестов
+    permission_classes = (AllowAny,)  # использую для тестов
 
 
 class UserRetrieveAPIView(generics.RetrieveAPIView):
