@@ -114,7 +114,7 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         subs_item = Subscription.objects.filter(user=user, course=course_item)
 
         if subs_item.exists():
-            subs_item.destroy()
+            subs_item.delete()
             message = "подписка удалена"
         else:
             Subscription.objects.create(user=user, course=course_item)
