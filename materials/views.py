@@ -97,7 +97,7 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
     )
 
 
-# Subscription generics
+# Subscription ViewSet
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
