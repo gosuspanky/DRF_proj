@@ -9,6 +9,10 @@ from users.serializers import UserSerializer, PaymentSerializer
 
 
 class UserCreateAPIView(generics.CreateAPIView):
+    """
+    Эндпоинт для регистрации пользователя.
+    """
+
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
@@ -21,30 +25,54 @@ class UserCreateAPIView(generics.CreateAPIView):
 
 
 class UserListAPIView(generics.ListAPIView):
+    """
+    Эндпоинт для получения списка пользователей.
+    """
+
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = (AllowAny,)  # использую для тестов
 
 
 class UserRetrieveAPIView(generics.RetrieveAPIView):
+    """
+    Эндпоинт для получения информации о пользователе.
+    """
+
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
 
 class UserUpdateAPIView(generics.UpdateAPIView):
+    """
+    Эндпоинт для обновления информации о пользователе.
+    """
+
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
 
 class UserDestroyAPIView(generics.DestroyAPIView):
+    """
+    Эндпоинт для удаления пользователя.
+    """
+
     queryset = User.objects.all()
 
 
 class PaymentCreateAPIView(generics.CreateAPIView):
+    """
+    Эндпоинт для создания платежа.
+    """
+
     serializer_class = PaymentSerializer
 
 
 class PaymentListAPIView(generics.ListAPIView):
+    """
+    Эндпоинт для получения списка платежей.
+    """
+
     serializer_class = PaymentSerializer
     queryset = Payments.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -57,14 +85,26 @@ class PaymentListAPIView(generics.ListAPIView):
 
 
 class PaymentRetrieveAPIView(generics.RetrieveAPIView):
+    """
+    Эндпоинт для получения информации о платеже.
+    """
+
     serializer_class = PaymentSerializer
     queryset = Payments.objects.all()
 
 
 class PaymentUpdateAPIView(generics.UpdateAPIView):
+    """
+    Эндпоинт для обновления информации о платеже.
+    """
+
     serializer_class = PaymentSerializer
     queryset = Payments.objects.all()
 
 
 class PaymentDestroyAPIView(generics.DestroyAPIView):
+    """
+    Эндпоинт для удаления платежа.
+    """
+
     queryset = Payments.objects.all()

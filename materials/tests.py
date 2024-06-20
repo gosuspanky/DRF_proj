@@ -33,7 +33,8 @@ class LessonTestCase(APITestCase):
             "title": "test_lesson_2",
             "course": self.course.pk,
             "video_link": "https://www.youtube.com/",
-            "owner": self.user.pk}
+            "owner": self.user.pk,
+        }
 
         response = self.client.post(url, data)
 
@@ -41,7 +42,7 @@ class LessonTestCase(APITestCase):
         self.assertEqual(Lesson.objects.all().count(), 2)
         self.assertEqual(Lesson.objects.last().title, "test_lesson_2")
         self.assertEqual(Lesson.objects.last().owner, self.user)
-        self.assertEqual(Lesson.objects.last().video_link, data['video_link'])
+        self.assertEqual(Lesson.objects.last().video_link, data["video_link"])
 
     def test_lesson_update(self):
         url = reverse("materials:lesson_update", args=(self.lesson.pk,))
@@ -54,7 +55,7 @@ class LessonTestCase(APITestCase):
         data = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(data.get('title'), "test_lesson_3")
+        self.assertEqual(data.get("title"), "test_lesson_3")
 
     def test_lesson_delete(self):
         url = reverse("materials:lesson_delete", args=(self.lesson.pk,))
@@ -80,7 +81,7 @@ class LessonTestCase(APITestCase):
                     "video_link": None,
                     "owner": self.user.pk,
                 }
-            ]
+            ],
         }
 
         response = self.client.get(url)
@@ -110,17 +111,19 @@ class SubscriptionTestCase(APITestCase):
             "course_id": self.course.pk,
         }
 
-        response = self.client.post("/subscription/create/", data, format='json')
+        response = self.client.post("/subscription/create/", data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        subs_item = Subscription.objects.filter(user=data['user'], course=data['course_id'])
+        subs_item = Subscription.objects.filter(
+            user=data["user"], course=data["course_id"]
+        )
 
         if subs_item.exists():
             subs_item.delete()
             self.assertEqual(subs_item.count(), 0)
             self.assertEqual(subs_item.exists(), False)
-            print('тест на удаление подписки пройден')
+            print("тест на удаление подписки пройден")
 
         if not subs_item.exists():
             Subscription.objects.create(user=self.user, course=self.course)
@@ -128,4 +131,4 @@ class SubscriptionTestCase(APITestCase):
             self.assertEqual(subs_item.count(), 1)
             self.assertEqual(Subscription.objects.last().user, self.user)
             self.assertEqual(Subscription.objects.last().course_id, self.course.pk)
-            print('тест на добавление подписки пройден')
+            print("тест на добавление подписки пройден")

@@ -4,13 +4,11 @@ from materials.models import Course, Lesson, Subscription
 from materials.validators import validate_link
 
 
-# class SubscriptionSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Subscription
-#         fields = ("id", "user", "course", "date")
-
-
 class LessonSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для урока
+    """
+
     video_link = serializers.CharField(validators=[validate_link])
 
     class Meta:
@@ -19,6 +17,10 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для курса
+    """
+
     lessons_count = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
     lessons_list = LessonSerializer(source="lessons", many=True, read_only=True)
@@ -30,7 +32,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_lessons_count(obj):
-        return Lesson.objects.filter(course=obj).count()
+        return Lesson.objects.filter(course=obj).count()  # Получение количества уроков
 
     class Meta:
         model = Course
