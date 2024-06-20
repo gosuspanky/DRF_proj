@@ -104,7 +104,6 @@ class SubscriptionTestCase(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_subscription_create_or_delete(self):
-        # url = reverse("/subscription/create/")
 
         data = {
             "user": self.user.pk,
