@@ -26,6 +26,9 @@ class LessonTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data.get("title"), self.lesson.title)
 
+        if not self.lesson.exists():
+            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_lesson_create(self):
         url = reverse("materials:lesson_create")
 
@@ -131,3 +134,6 @@ class SubscriptionTestCase(APITestCase):
             self.assertEqual(Subscription.objects.last().user, self.user)
             self.assertEqual(Subscription.objects.last().course_id, self.course.pk)
             print("тест на добавление подписки пройден")
+
+        if not self.user.is_authenticated:
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
