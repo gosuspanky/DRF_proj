@@ -15,4 +15,4 @@ class LessonAdmin(admin.ModelAdmin):
 
 @admin.register(Subscription)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "course", "date")
+    list_display = ("id", "user", "course", "created_at")

@@ -81,7 +81,7 @@ class Subscription(models.Model):
         related_name="subscriptions",
     )
 
-    date = models.DateField(auto_now_add=True, verbose_name="Дата подписки", **NULLABLE)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время подписки")
 
     class Meta:
         verbose_name = "Подписка"

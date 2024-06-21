@@ -26,8 +26,9 @@ class LessonTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data.get("title"), self.lesson.title)
 
-        if not self.lesson.exists():
-            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        url_2 = reverse("materials:lesson_detail", args=(65,))
+        response_2 = self.client.get(url_2)
+        self.assertEqual(response_2.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_lesson_create(self):
         url = reverse("materials:lesson_create")
@@ -39,6 +40,13 @@ class LessonTestCase(APITestCase):
             "owner": self.user.pk,
         }
 
+        data_2 = {
+            "title": "test_lesson_3",
+            "course": self.course.pk,
+            "video_link": "https://www.vk.ru/",
+            "owner": self.user.pk,
+        }
+
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -46,6 +54,10 @@ class LessonTestCase(APITestCase):
         self.assertEqual(Lesson.objects.last().title, "test_lesson_2")
         self.assertEqual(Lesson.objects.last().owner, self.user)
         self.assertEqual(Lesson.objects.last().video_link, data["video_link"])
+
+        response = self.client.post(url, data_2)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_lesson_update(self):
         url = reverse("materials:lesson_update", args=(self.lesson.pk,))
@@ -134,6 +146,8 @@ class SubscriptionTestCase(APITestCase):
             self.assertEqual(Subscription.objects.last().user, self.user)
             self.assertEqual(Subscription.objects.last().course_id, self.course.pk)
             print("тест на добавление подписки пройден")
+
+        self.client.logout()
 
         if not self.user.is_authenticated:
             self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

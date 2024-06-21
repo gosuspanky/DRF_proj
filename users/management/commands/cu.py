@@ -11,5 +11,7 @@ class Command(BaseCommand):
             print("Пользователь с таким email уже существует.")
         else:
             user = User.objects.create(email=user_email)
+            user.is_active = True
+            user.set_password("spanky290195")
             user.save()
             print(f"Пользователь {user_email} успешно создан.")

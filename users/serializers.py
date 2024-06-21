@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'phone_number', 'city', 'first_name', 'last_name', 'payments_history')
+        fields = ('id', 'email', 'phone_number', 'city', 'first_name', 'last_name', 'is_active', 'payments_history')
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
