@@ -10,7 +10,10 @@ class PaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Payments
-        exclude = ("tokens", "payment_id",)
+        exclude = (
+            "tokens",
+            "payment_id",
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,7 +25,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'phone_number', 'city', 'first_name', 'last_name', 'is_active', 'payments_history')
+        fields = (
+            "id",
+            "email",
+            "phone_number",
+            "city",
+            "first_name",
+            "last_name",
+            "is_active",
+            "payments_history",
+        )
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -32,4 +44,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ("password", "last_name", )
+        exclude = (
+            "password",
+            "last_name",
+        )

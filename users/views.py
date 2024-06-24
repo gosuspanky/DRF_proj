@@ -94,7 +94,9 @@ class PaymentCreateAPIView(generics.CreateAPIView):
     def perform_create(self, serializer):
         payment = serializer.save(user=self.request.user)
 
-        product_id = stripe.Product.create(name=f"Payment for {payment.paid_course.title or payment.paid_lesson.title}")
+        product_id = stripe.Product.create(
+            name=f"Payment for {payment.paid_course.title or payment.paid_lesson.title}"
+        )
 
         price_id = create_stripe_price(product_id, payment.payment_count)
 
@@ -145,10 +147,9 @@ class PaymentRetrieveAPIView(generics.RetrieveAPIView):
         payment.status = check_out.payment_status
         payment.save()
 
-        return Response(data={
-            "Payment": payment_data,
-            "Статус платежа": check_out.payment_status
-        })
+        return Response(
+            data={"Payment": payment_data, "Статус платежа": check_out.payment_status}
+        )
 
 
 class PaymentUpdateAPIView(generics.UpdateAPIView):

@@ -171,10 +171,7 @@ class CourseTestCase(APITestCase):
         self.assertEqual(response_2.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_course_create(self):
-        data = {
-            "title": "test_course_2",
-            "description": "test_course_description"
-        }
+        data = {"title": "test_course_2", "description": "test_course_description"}
         response = self.client.post("/materials/", data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -216,7 +213,7 @@ class CourseTestCase(APITestCase):
                     "lessons_count": 0,
                     "owner": self.user.pk,
                     "lessons_list": [],
-                    "is_subscribed": False
+                    "is_subscribed": False,
                 }
             ],
         }

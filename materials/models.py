@@ -81,8 +81,12 @@ class Subscription(models.Model):
         related_name="subscriptions",
     )
 
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время подписки")
-    is_subscribed = models.BooleanField(**NULLABLE, default=True, verbose_name="Подписка актив")
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Дата и время подписки"
+    )
+    is_subscribed = models.BooleanField(
+        **NULLABLE, default=True, verbose_name="Подписка актив"
+    )
 
     class Meta:
         verbose_name = "Подписка"

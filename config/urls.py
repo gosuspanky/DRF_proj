@@ -24,7 +24,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("materials.urls", namespace="materials")),
     path("users/", include("users.urls", namespace="users")),
-
     # урл-паттерны с документацией
     path(
         "swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"

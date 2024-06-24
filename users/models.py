@@ -63,11 +63,13 @@ class Payments(models.Model):
     payment_count = models.PositiveIntegerField(verbose_name="Сумма оплаты")
     payment_method = models.CharField(max_length=50, verbose_name="Метод оплаты")
 
-    tokens = models.CharField(max_length=400, verbose_name='tokens', **NULLABLE)
+    tokens = models.CharField(max_length=400, verbose_name="tokens", **NULLABLE)
 
     payment_id = models.CharField(max_length=50, verbose_name="id оплаты", **NULLABLE)
 
-    payment_link = models.CharField(max_length=400, verbose_name="ссылка на оплату", **NULLABLE)
+    payment_link = models.CharField(
+        max_length=400, verbose_name="ссылка на оплату", **NULLABLE
+    )
 
     status = models.CharField(max_length=50, verbose_name="статус", **NULLABLE)
 
