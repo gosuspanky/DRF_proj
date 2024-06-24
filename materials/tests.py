@@ -147,7 +147,39 @@ class SubscriptionTestCase(APITestCase):
             self.assertEqual(Subscription.objects.last().course_id, self.course.pk)
             print("тест на добавление подписки пройден")
 
-        self.client.logout()
+        self.client = APIClient()
 
         if not self.user.is_authenticated:
             self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class CourseTestCase(APITestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(email="test@email.com", password="123")
+        self.course = Course.objects.create(title="test_course")
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_course_create(self):
+        data = {
+            "title": "test_course_2",
+            "description": "test_course_description"
+        }
+        response = self.client.post("/materials/", data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(Course.objects.all().count(), 2)
+        self.assertEqual(Course.objects.last().title, "test_course_2")
+        self.assertEqual(Course.objects.last().owner, self.user)
+
+    # def test_course_retrieve(self):
+    #     response = self.client.get(f"/materials/1/")
+    #     print(response.json())
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     # self.assertEqual(data.get("title"), self.course.title)
+    #
+    #     # response_2 = self.client.get(f"/materials/65/")
+    #     #
+    #     # self.assertEqual(response_2.status_code, status.HTTP_404_NOT_FOUND)
