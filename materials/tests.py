@@ -2,8 +2,6 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from rest_framework.response import Response
-
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 
@@ -157,9 +155,20 @@ class CourseTestCase(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create(email="test@email.com", password="123")
-        self.course = Course.objects.create(title="test_course")
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
+        self.course = Course.objects.create(title="test_course", owner=self.user)
+
+    def test_course_retrieve(self):
+        response = self.client.get(f"/materials/{self.course.pk}/")
+        data = response.json()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(data.get("title"), self.course.title)
+
+        response_2 = self.client.get(f"/materials/65/")
+
+        self.assertEqual(response_2.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_course_create(self):
         data = {
@@ -174,12 +183,48 @@ class CourseTestCase(APITestCase):
         self.assertEqual(Course.objects.last().title, "test_course_2")
         self.assertEqual(Course.objects.last().owner, self.user)
 
-    # def test_course_retrieve(self):
-    #     response = self.client.get(f"/materials/1/")
-    #     print(response.json())
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     # self.assertEqual(data.get("title"), self.course.title)
-    #
-    #     # response_2 = self.client.get(f"/materials/65/")
-    #     #
-    #     # self.assertEqual(response_2.status_code, status.HTTP_404_NOT_FOUND)
+    def test_course_update(self):
+        data = {
+            "title": "test_course_3",
+        }
+
+        response = self.client.patch(f"/materials/{self.course.pk}/", data)
+        data = response.json()
+        print(data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data.get("title"), "test_course_3")
+
+    def test_course_delete(self):
+        response = self.client.delete(f"/materials/{self.course.pk}/")
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Course.objects.all().count(), 0)
+
+    def test_course_list(self):
+        response = self.client.get(f"/materials/")
+
+        result = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": self.course.pk,
+                    "title": "test_course",
+                    "description": None,
+                    "lessons_count": 0,
+                    "owner": self.user.pk,
+                    "lessons_list": [],
+                    "is_subscribed": False
+                }
+            ],
+        }
+
+        data = response.json()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Course.objects.all().count(), 1)
+        self.assertEqual(Course.objects.last().title, "test_course")
+        self.assertEqual(Course.objects.last().owner, self.user)
+        self.assertEqual(data, result)
