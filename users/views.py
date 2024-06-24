@@ -9,6 +9,7 @@ from rest_framework.response import Response
 
 import stripe
 
+from users.services import CreateStripePayment
 from django_filters.rest_framework import DjangoFilterBackend
 
 from materials.models import Course
@@ -97,6 +98,14 @@ class PaymentCreateAPIView(generics.CreateAPIView):
 
         payment_count = self.request.data.get("payment_count")
 
+        # stripe_payment = CreateStripePayment(course_item.title, payment_count)
+        #
+        # # stripe.Product.create(name=course_item.title)
+        # #
+        # # price = create_stripe_price(course_item.title, payment_count)
+        # #
+        # # session = create_stripe_session(price.id)
+
         stripe.Product.create(name=course_item.title)
 
         price = stripe.Price.create(
@@ -111,7 +120,30 @@ class PaymentCreateAPIView(generics.CreateAPIView):
             mode="payment",
         )
 
+        # check_out = stripe.checkout.Session.retrieve(
+        #     session.id,
+        # )
+
+
+
+        # stripe_data = {
+        #     "price_id": price.id,
+        #     "session_id": session.id,
+        #     "session_url": session.url,
+        # }
+
         return Response(data={"url": session.url})
+
+    # def perform_create(self, serializer):
+    #     """
+    #     Метод получения владельца курса
+    #     :param serializer: на вход получаем сериализатор
+    #     """
+    #     payment = serializer.save()
+    #     payment.payment_id = self.post.stripe_data["price_id"],
+    #     payment.payment_link = self.post.stripe_data["session_url"],
+    #     payment.token = self.post.stripe_data["session_id"]
+    #     payment.save()
 
 
 class PaymentListAPIView(generics.ListAPIView):
