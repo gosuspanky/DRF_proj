@@ -3,10 +3,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from materials.models import Course, Lesson, Subscription
 from materials.paginations import CustomPagination
 from materials.serializers import CourseSerializer, LessonSerializer
+from materials.tasks import send_info_about_update
 from users.permissions import IsModer, IsOwner
 
 
@@ -21,7 +23,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """
-        метод получения разрешений
+        Метод получения разрешений
         :return: возвращает список разрешений
         """
         if self.action == "create":
@@ -50,13 +52,23 @@ class CourseViewSet(viewsets.ModelViewSet):
         course.owner = self.request.user
         course.save()
 
-    def get_queryset(self, *args, **kwargs):
-        """
-        Метод получения курсов с фильтрацией по владельцу
-        """
-        queryset = super().get_queryset()
-        queryset = queryset.filter(owner=self.request.user.pk)
-        return queryset
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        queryset = Subscription.objects.filter(course=instance)
+        if queryset.filter(is_subscribed=True).exists():
+            send_info_about_update.delay(instance.owner.email)
+        else:
+            print("Нет подписок на курс")
+        return instance
+
+
+def get_queryset(self, *args, **kwargs):
+    """
+    Метод получения курсов с фильтрацией по владельцу
+    """
+    queryset = super().get_queryset()
+    queryset = queryset.filter(owner=self.request.user.pk)
+    return queryset
 
 
 # Lesson generics
@@ -151,10 +163,11 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         IsAuthenticated,
         ~IsModer,
     )
+    queryset = Subscription.objects.all()
 
     def post(self, *args, **kwargs):
         """
-        Метод создания подписки, если подписка уже есть, то удаляет ее
+        Метод создания подписки. Если подписка уже есть, то удаляет ее.
         :return: Возвращает сообщение об успешной подписке
         """
         user = self.request.user
@@ -164,7 +177,7 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         subs_item = Subscription.objects.filter(user=user, course=course_item)
 
         if subs_item.exists():
-            subs_item.delete()
+            subs_item.is_subscribed = False
             message = "подписка удалена"
         else:
             Subscription.objects.create(user=user, course=course_item)

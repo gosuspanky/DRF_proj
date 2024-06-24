@@ -69,6 +69,8 @@ class Payments(models.Model):
 
     payment_link = models.CharField(max_length=400, verbose_name="ссылка на оплату", **NULLABLE)
 
+    status = models.CharField(max_length=50, verbose_name="статус", **NULLABLE)
+
     def __str__(self):
         return f"{self.user} - {self.paid_course if self.paid_course else self.paid_lesson}"
 

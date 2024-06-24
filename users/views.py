@@ -9,14 +9,15 @@ from rest_framework.response import Response
 
 import stripe
 
-from users.services import CreateStripePayment
 from django_filters.rest_framework import DjangoFilterBackend
 
+from config.settings import STRIPE_SECRET_KEY
 from materials.models import Course
 from users.models import User, Payments
 from users.serializers import UserSerializer, PaymentSerializer, UserProfileSerializer
+from users.services import create_stripe_price, create_stripe_session
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+stripe.api_key = STRIPE_SECRET_KEY
 
 
 class UserCreateAPIView(generics.CreateAPIView):
@@ -90,60 +91,23 @@ class PaymentCreateAPIView(generics.CreateAPIView):
     serializer_class = PaymentSerializer
     queryset = Payments.objects.all()
 
-    def post(self, *args, **kwargs):
-        super().post(*args, **kwargs)
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
 
-        course_id = self.request.data.get("paid_course")
-        course_item = get_object_or_404(Course, pk=course_id)
+        product_id = stripe.Product.create(name=f"Payment for {payment.paid_course.title or payment.paid_lesson.title}")
 
-        payment_count = self.request.data.get("payment_count")
+        price_id = create_stripe_price(product_id, payment.payment_count)
 
-        # stripe_payment = CreateStripePayment(course_item.title, payment_count)
-        #
-        # # stripe.Product.create(name=course_item.title)
-        # #
-        # # price = create_stripe_price(course_item.title, payment_count)
-        # #
-        # # session = create_stripe_session(price.id)
+        session = create_stripe_session(price_id)
 
-        stripe.Product.create(name=course_item.title)
+        # Обновление информации о платеже
 
-        price = stripe.Price.create(
-            unit_amount=payment_count * 100,
-            currency="rub",
-            product_data={"name": course_item.title},
-        )
+        payment.payment_id = price_id
+        payment.payment_link = session.url
+        payment.tokens = session.id
+        payment.save()
 
-        session = stripe.checkout.Session.create(
-            success_url="https://example.com/success",
-            line_items=[{"price": price.id, "quantity": 1}],
-            mode="payment",
-        )
-
-        # check_out = stripe.checkout.Session.retrieve(
-        #     session.id,
-        # )
-
-
-
-        # stripe_data = {
-        #     "price_id": price.id,
-        #     "session_id": session.id,
-        #     "session_url": session.url,
-        # }
-
-        return Response(data={"url": session.url})
-
-    # def perform_create(self, serializer):
-    #     """
-    #     Метод получения владельца курса
-    #     :param serializer: на вход получаем сериализатор
-    #     """
-    #     payment = serializer.save()
-    #     payment.payment_id = self.post.stripe_data["price_id"],
-    #     payment.payment_link = self.post.stripe_data["session_url"],
-    #     payment.token = self.post.stripe_data["session_id"]
-    #     payment.save()
+        return Response(data={"Ссылка на оплату": session.url})
 
 
 class PaymentListAPIView(generics.ListAPIView):
@@ -169,6 +133,22 @@ class PaymentRetrieveAPIView(generics.RetrieveAPIView):
 
     serializer_class = PaymentSerializer
     queryset = Payments.objects.all()
+
+    def get(self, *args, **kwargs):
+        payment_data = super().get(*args, **kwargs).data
+        payment = get_object_or_404(Payments, pk=self.kwargs["pk"])
+
+        check_out = stripe.checkout.Session.retrieve(
+            payment.tokens,
+        )
+
+        payment.status = check_out.payment_status
+        payment.save()
+
+        return Response(data={
+            "Payment": payment_data,
+            "Статус платежа": check_out.payment_status
+        })
 
 
 class PaymentUpdateAPIView(generics.UpdateAPIView):
