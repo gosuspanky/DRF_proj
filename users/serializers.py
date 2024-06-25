@@ -34,6 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "is_active",
             "payments_history",
+            "last_login",
         )
 
 
