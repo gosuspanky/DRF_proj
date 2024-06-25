@@ -45,3 +45,9 @@ class CourseSerializer(serializers.ModelSerializer):
             "lessons_list",
             "is_subscribed",
         )
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = "__all__"

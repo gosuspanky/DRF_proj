@@ -7,7 +7,11 @@ from rest_framework.decorators import action
 
 from materials.models import Course, Lesson, Subscription
 from materials.paginations import CustomPagination
-from materials.serializers import CourseSerializer, LessonSerializer
+from materials.serializers import (
+    CourseSerializer,
+    LessonSerializer,
+    SubscriptionSerializer,
+)
 from materials.tasks import send_info_about_update
 from users.permissions import IsModer, IsOwner
 
@@ -55,10 +59,18 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         instance = serializer.save()
         queryset = Subscription.objects.filter(course=instance)
-        if queryset.filter(is_subscribed=True).exists():
-            send_info_about_update.delay(instance.owner.email)
-        else:
-            print("Нет подписок на курс")
+
+        owner = instance.owner.email
+        subject = f"Обновление курса {instance.title}"
+        message = f"Курс {instance.title} был обновлен, проверьте на сайте"
+
+        for q in queryset:
+            user = q.user.email
+
+            if queryset.filter(user=q.user.pk).exists():
+                send_info_about_update.delay(subject, message, user)
+            else:
+                print("Нет подписок на курс")
         return instance
 
 
@@ -159,13 +171,10 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     Эндпоинты для работы с подписками
     """
 
-    permission_classes = (
-        IsAuthenticated,
-        ~IsModer,
-    )
+    serializer_class = SubscriptionSerializer
     queryset = Subscription.objects.all()
 
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """
         Метод создания подписки. Если подписка уже есть, то удаляет ее.
         :return: Возвращает сообщение об успешной подписке
@@ -177,10 +186,11 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         subs_item = Subscription.objects.filter(user=user, course=course_item)
 
         if subs_item.exists():
-            subs_item.is_subscribed = False
+            subs_item.delete()
             message = "подписка удалена"
         else:
-            Subscription.objects.create(user=user, course=course_item)
+            subs_item = Subscription(user=user, course=course_item)
+            subs_item.save()
             message = "подписка добавлена"
 
-        return Response({"message": message})
+        return Response(data={"message": message})
