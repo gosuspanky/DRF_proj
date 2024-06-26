@@ -138,6 +138,17 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 
+# Celery-beat
+
+CELERY_BEAT_SCHEDULE = {
+    "check_activity": {
+        "task": "users.tasks.check_activity",
+        "schedule": timedelta(
+            days=30
+        ),  # Выполнение задачи "проверка активности" каждый месяц
+    },
+}
+
 # Email
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
 EMAIL_HOST = os.getenv("EMAIL_HOST")

@@ -26,6 +26,8 @@ requests = "^2.32.3"
 stripe = "^9.12.0"
 coverage = "^7.5.4"
 django-celery-beat = "^2.6.0"
+eventlet = "^0.36.1"
+gevent = "^24.2.1"
 
 [build-system]
 requires = ["poetry-core"]
